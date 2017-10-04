@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="screen.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.css" />
+    <style type="text/css">
+      #top_container{
+        width: 879px;
+        height: auto;
+        margin: 0 auto;
+        border-bottom: solid;
+        text-align: center;
+        margin-bottom: 1em;
+      }
+      #title{
+        font-size: 2.5em;
+        font-weight: bold;
+      }
+      #name{
+        margin-top: 1.5em;
+        font-size: 1.5em;
+      }
+      #subtitle{
+        font-size: 1.5em;
+        font-weight: lighter;
+        margin-bottom: 1.5em;
+      }
+      .button{
+        margin: 0 3.5em;
+      }
+      #result{
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+
+
+<div id="top_container">
+<h1 id="title">ITMD - 465 - Lab 3</h1>
+<h2 id="subtitle"> Junfeng Wang | jwang206@hawk.iit.edu</h2>
+<input id="load_btn" class="button is-dark" type="submit" value="Load Data">
+<input id="reset_btn" class="button is-danger" type="reset" value="Reset">
+
+<h4 id="name">Employee List</h4>
+</div>
+
+<table class="table is-bordered is-striped is-narrow" id="result">
+  
+  <thead id="table_head">
+    <tr id="table_head_row"></tr>
+  </thead>
+
+  <tfoot id="table_foot">
+    <tr id="table_foot_row"></tr>
+  </tfoot>
+  
+  <tbody id="table_body">
+  </tbody>
+
+</table>
+
+
+  </body>
+    <script type="text/javascript">
+      var load_btn = document.getElementById('load_btn');
+var reset_btn = document.getElementById('reset_btn');
+reset_btn.disabled=true;
+window.onload = request();
+
+reset_btn.addEventListener("click", function(){
+  document.getElementById('table_head_row').innerHTML="";
+  document.getElementById('table_body').innerHTML = "";
+  document.getElementById('table_foot_row').innerHTML = "";
+  load_btn.disabled=false;
+  request();
+  reset_btn.disabled=true;
+
+});
+
+function parseData(arr) {     
+      //thead
+      for (var i =0; i < Object.keys(arr[0]).length;i++) {
+        var thead_header = document.createElement("th");
+        thead_header.style.textTransform = "uppercase";
+        var text = document.createTextNode(Object.keys(arr[0])[i]);
+        thead_header.appendChild(text); 
+        document.getElementById('table_head_row').appendChild(thead_header);
+      }     
+    
+
+      load_btn.addEventListener("click", function(){
+          if (document.getElementById('table_head').rows[0].innerHTML){
+            //clear out old values
+            document.getElementById('table_body').innerHTML = "";
+            document.getElementById('table_foot_row').innerHTML = "";
+          }
+
+          //tbody
+          for (var i = 0; i < arr.length; i++) {
+                var items = document.createElement("tr");
+              items.id = "item "+i;
+              document.getElementById("table_body").appendChild(items);
+
+              //DOM dispplay id (table head)
+              var thead = document.createElement("th");
+              thead.id = ++i;
+              var text = document.createTextNode(arr[--i].id);
+              thead.appendChild(text);
+              items.appendChild(thead);
+
+            for(var x = 1; x < Object.keys(arr[0]).length; x++){
+              //DOM displayy firstname (table row)
+              var td = document.createElement("td");
+              td.id = ("data_num" + x);
+              var text = document.createTextNode(Object.values(arr[i])[x]);
+
+              td.appendChild(text);         
+              items.appendChild(td);
+
+              //validate active status
+              if (text.data==="false") {
+                td.style.backgroundColor = "rgb(222, 46, 25)";
+                td.style.color = "white";
+                td.innerHTML = "No";
+              }
+
+              if (text.data==="true") {
+                td.style.backgroundColor = "#39a237";
+                td.style.color = "white";
+                td.innerHTML = "Yes";
+              }
+            }
+          
+          }
+
+          load_btn.disabled=true;
+          reset_btn.disabled=false;
+    });
+}
+
+function request(){
+  if (reset_btn.disabled) {
+  }
+    var myRequest = new XMLHttpRequest();
+    myRequest.onreadystatechange = function(){
+      if (myRequest.readyState === 4 && myRequest.status === 200) {
+        var data = JSON.parse(myRequest.responseText);
+        if (Array.isArray(data)) {
+          parseData(data);
+        } else {
+          console.log('single object: ');
+          console.log(data);
+        }
+      }
+    };
+
+    myRequest.open('GET', 'http://libertyville.rice.iit.edu/scripts/4565_lab3.php', true);
+    myRequest.send();
+}
+    </script>
+</html>
